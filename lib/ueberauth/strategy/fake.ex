@@ -31,18 +31,20 @@ defmodule Ueberauth.Strategy.Fake do
       |> options
       |> Keyword.fetch!(:user_db)
 
-    handle_user_db_entry(original_conn, user, user_db)
+    user_db_entry = user_db.lookup_user(user)
+
+    handle_user_db_entry(original_conn, user, user_db_entry)
   end
 
   defp handle_user_db_entry(conn, _user, %Error{} = error) do
     conn
-    |> set_errors!([error])
+    |> set_errors!(error)
   end
 
-  defp handle_user_db_entry(conn, user, user_db) do
+  defp handle_user_db_entry(conn, user, user_db_entry) do
     conn
     |> put_private(:ueberauth_fake_user, user)
-    |> put_private(:ueberauth_fake_auth, user_db.lookup_user(user))
+    |> put_private(:ueberauth_fake_auth, user_db_entry)
   end
 
   def uid(conn) do

@@ -16,4 +16,10 @@ defmodule Ueberauth.Strategy.Fake.TestUserDB do
         name: "User McUser"
       }
     }
+
+  def lookup_user("nouser"),
+    do: %Ueberauth.Failure.Error{
+      message_key: "no_such_user",
+      message: "No such user"
+    }
 end

@@ -42,4 +42,15 @@ defmodule UeberauthFakeTest do
 
     assert %{name: "User McUser", email: "user@example.com"} = info
   end
+
+  test "it fails when an error is present in the UserDB" do
+    routes = Ueberauth.init()
+
+    conn =
+      conn(:get, "/auth/fake/callback")
+      |> Plug.Test.put_req_cookie("ueberauth_fake_user", "nouser")
+      |> Ueberauth.call(routes)
+
+    assert %{ueberauth_failure: %{}} = conn.assigns
+  end
 end
