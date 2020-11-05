@@ -25,6 +25,31 @@ defmodule UeberauthFakeTest do
     assert location.path == "/auth/fake/callback"
   end
 
+  test "it redirects to the callback if a user cookie is already set" do
+    routes = Ueberauth.init()
+
+    conn =
+      conn(:get, "/auth/fake")
+      |> put_req_header("cookie", "ueberauth_fake_user=fakeuser")
+      |> Ueberauth.call(routes)
+
+    assert conn.status == 302
+    assert [location] = get_resp_header(conn, "location")
+
+    location = URI.parse(location)
+    assert location.path == "/auth/fake/callback"
+  end
+
+  test "it does nothing when neither a query param nor a cookie is given" do
+    routes = Ueberauth.init()
+
+    conn =
+      conn(:get, "/auth/fake")
+      |> Ueberauth.call(routes)
+
+    assert is_nil(conn.status)
+  end
+
   test "it succeeds when a user cookie is set" do
     routes = Ueberauth.init()
 

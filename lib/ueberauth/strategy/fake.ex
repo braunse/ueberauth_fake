@@ -16,6 +16,20 @@ defmodule Ueberauth.Strategy.Fake do
     |> redirect!(callback_url(conn))
   end
 
+  def handle_request!(%{cookies: %Plug.Conn.Unfetched{}} = conn) do
+    conn
+    |> fetch_cookies()
+    |> handle_request!
+  end
+
+  def handle_request!(%{cookies: %{"ueberauth_fake_user" => _user}} = conn) do
+    redirect!(conn, callback_url(conn))
+  end
+
+  def handle_request!(conn) do
+    conn
+  end
+
   def handle_callback!(%{cookies: %Plug.Conn.Unfetched{}} = conn) do
     conn
     |> fetch_cookies()
